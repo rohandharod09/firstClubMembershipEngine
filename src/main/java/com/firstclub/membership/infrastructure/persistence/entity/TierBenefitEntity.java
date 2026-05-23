@@ -1,6 +1,9 @@
 package com.firstclub.membership.infrastructure.persistence.entity;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
+
 import java.time.Instant;
 import java.util.UUID;
 
@@ -19,6 +22,7 @@ public class TierBenefitEntity {
     @Column(name = "benefit_type", nullable = false, length = 50)
     private String benefitType;
 
+    @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "config_json", columnDefinition = "jsonb", nullable = false)
     private String configJson;
 

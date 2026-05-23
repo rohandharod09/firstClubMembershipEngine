@@ -1,6 +1,9 @@
 package com.firstclub.membership.infrastructure.persistence.entity;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
+
 import java.time.Instant;
 import java.util.UUID;
 
@@ -21,6 +24,7 @@ public class IdempotencyRecordEntity {
     @Column(name = "resource_id", columnDefinition = "uuid")
     private UUID resourceId;
 
+    @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "response_payload", columnDefinition = "jsonb")
     private String responsePayload;
 
