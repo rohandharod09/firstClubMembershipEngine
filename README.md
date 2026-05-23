@@ -1,8 +1,5 @@
 # FirstClub Membership Engine
 
-
----
-
 ## Features
 
 - **Membership Plans** — Monthly (₹99), Quarterly (₹249), Yearly (₹899) plans
