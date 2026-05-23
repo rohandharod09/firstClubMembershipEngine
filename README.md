@@ -1,9 +1,5 @@
 # FirstClub Membership Engine
 
-A production-grade, modular membership platform built for the FirstClub quick-commerce grocery application. Designed for an SDE-2 backend interview, demonstrating clean architecture, domain-driven design, extensibility, concurrency handling, and event-driven patterns.
-
----
-
 ## Features
 
 - **Membership Plans** — Monthly (₹99), Quarterly (₹249), Yearly (₹899) plans
