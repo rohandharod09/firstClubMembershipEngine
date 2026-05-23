@@ -52,19 +52,28 @@ public class RenewalProcessorJob {
                 subscriptionRepo.findGracePeriodAutoRenew(BATCH_SIZE);
 
         if (gracePeriodSubs.isEmpty()) {
+            log.debug("RenewalProcessorJob: no auto-renew candidates");
             return;
         }
 
-        log.info("Processing {} renewal candidates", gracePeriodSubs.size());
+        long start = System.currentTimeMillis();
+        log.info("RenewalProcessorJob started: {} auto-renew candidates", gracePeriodSubs.size());
+        int succeeded = 0;
+        int failed = 0;
 
         for (UserSubscription subscription : gracePeriodSubs) {
             try {
                 processRenewal(subscription);
+                succeeded++;
             } catch (Exception e) {
+                failed++;
                 log.error("Renewal failed for subscriptionId={}: {}",
                         subscription.getId(), e.getMessage());
             }
         }
+
+        log.info("RenewalProcessorJob completed: {} renewed, {} failed, {} ms elapsed",
+                succeeded, failed, System.currentTimeMillis() - start);
     }
 
     private void processRenewal(UserSubscription subscription) {

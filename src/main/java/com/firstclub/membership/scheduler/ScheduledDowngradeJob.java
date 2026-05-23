@@ -46,10 +46,13 @@ public class ScheduledDowngradeJob {
                 subscriptionRepo.findScheduledDowngrades(clock.now(), BATCH_SIZE);
 
         if (toDowngrade.isEmpty()) {
+            log.debug("ScheduledDowngradeJob: nothing to process");
             return;
         }
 
-        log.info("Applying {} scheduled downgrades", toDowngrade.size());
+        long start = System.currentTimeMillis();
+        log.info("ScheduledDowngradeJob started: {} subscriptions to downgrade", toDowngrade.size());
+        int processed = 0;
 
         for (UserSubscription subscription : toDowngrade) {
             try {
@@ -64,10 +67,14 @@ public class ScheduledDowngradeJob {
 
                 log.info("Downgrade applied: subscriptionId={} from={} to={}",
                         subscription.getId(), fromTierId, toTierId);
+                processed++;
             } catch (Exception e) {
                 log.error("Failed to apply downgrade for subscriptionId={}: {}",
                         subscription.getId(), e.getMessage());
             }
         }
+
+        log.info("ScheduledDowngradeJob completed: {}/{} applied in {} ms",
+                processed, toDowngrade.size(), System.currentTimeMillis() - start);
     }
 }

@@ -1,5 +1,8 @@
 package com.firstclub.membership.domain.model;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.util.UUID;
 
 public class TierBenefit {
@@ -10,7 +13,13 @@ public class TierBenefit {
     private final String configJson;
     private final boolean active;
 
-    public TierBenefit(UUID id, UUID tierId, BenefitType benefitType, String configJson, boolean active) {
+    @JsonCreator
+    public TierBenefit(
+            @JsonProperty("id") UUID id,
+            @JsonProperty("tierId") UUID tierId,
+            @JsonProperty("benefitType") BenefitType benefitType,
+            @JsonProperty("configJson") String configJson,
+            @JsonProperty("active") boolean active) {
         this.id = id;
         this.tierId = tierId;
         this.benefitType = benefitType;

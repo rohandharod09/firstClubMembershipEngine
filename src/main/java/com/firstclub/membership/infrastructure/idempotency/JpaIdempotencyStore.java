@@ -4,6 +4,8 @@ import com.firstclub.membership.application.port.outbound.IdempotencyStore;
 import com.firstclub.membership.domain.model.IdempotencyRecord;
 import com.firstclub.membership.infrastructure.persistence.entity.IdempotencyRecordEntity;
 import com.firstclub.membership.infrastructure.persistence.repository.IdempotencyRecordJpaRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -13,6 +15,8 @@ import java.util.UUID;
 
 @Component
 public class JpaIdempotencyStore implements IdempotencyStore {
+
+    private static final Logger log = LoggerFactory.getLogger(JpaIdempotencyStore.class);
 
     private final IdempotencyRecordJpaRepository jpaRepo;
     private final long ttlHours;
@@ -27,7 +31,15 @@ public class JpaIdempotencyStore implements IdempotencyStore {
     public Optional<IdempotencyRecord> findByKey(String idempotencyKey) {
         return jpaRepo.findByIdempotencyKey(idempotencyKey)
                 .map(this::toDomain)
-                .filter(record -> !record.isExpired());
+                .filter(record -> {
+                    if (record.isExpired()) {
+                        log.debug("idempotency key found but expired: key={}", idempotencyKey);
+                        return false;
+                    }
+                    log.info("idempotency HIT — returning cached response: key={} resourceId={}",
+                            idempotencyKey, record.getResourceId());
+                    return true;
+                });
     }
 
     @Override
@@ -42,6 +54,8 @@ public class JpaIdempotencyStore implements IdempotencyStore {
         entity.setCreatedAt(Instant.now());
         entity.setExpiresAt(Instant.now().plusSeconds(ttlHours * 3600));
         jpaRepo.save(entity);
+        log.debug("idempotency record saved: key={} resourceType={} resourceId={} ttlHours={}",
+                idempotencyKey, resourceType, resourceId, ttlHours);
     }
 
     private IdempotencyRecord toDomain(IdempotencyRecordEntity entity) {

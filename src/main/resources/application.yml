@@ -81,6 +81,15 @@ membership:
     idempotency-cleanup-cron: "0 0 * * * *"   # every hour
 
 logging:
+  pattern:
+    # Includes correlationId and requestPath set by MdcRequestFilter in every log line
+    console: "%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} [cid=%X{correlationId} path=%X{requestPath}] - %msg%n"
   level:
     com.firstclub.membership: INFO
+    # Set to DEBUG to see cache miss logs and idempotency save/expire messages
+    com.firstclub.membership.application.handler: DEBUG
+    com.firstclub.membership.infrastructure.idempotency: DEBUG
+    # Uncomment to debug Redis connection and serialization issues:
+    # org.springframework.data.redis: DEBUG
+    # io.lettuce.core: DEBUG
     org.hibernate.SQL: WARN
