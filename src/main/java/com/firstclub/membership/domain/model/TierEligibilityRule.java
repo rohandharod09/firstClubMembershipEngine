@@ -1,5 +1,8 @@
 package com.firstclub.membership.domain.model;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.util.UUID;
 
 public class TierEligibilityRule {
@@ -10,7 +13,13 @@ public class TierEligibilityRule {
     private final String configJson;
     private final String operator;
 
-    public TierEligibilityRule(UUID id, UUID tierId, String ruleType, String configJson, String operator) {
+    @JsonCreator
+    public TierEligibilityRule(
+            @JsonProperty("id") UUID id,
+            @JsonProperty("tierId") UUID tierId,
+            @JsonProperty("ruleType") String ruleType,
+            @JsonProperty("configJson") String configJson,
+            @JsonProperty("operator") String operator) {
         this.id = id;
         this.tierId = tierId;
         this.ruleType = ruleType;

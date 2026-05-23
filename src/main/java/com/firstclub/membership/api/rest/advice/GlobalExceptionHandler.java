@@ -24,6 +24,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(SubscriptionConflictException.class)
     public ResponseEntity<ProblemDetail> handleConflict(
             SubscriptionConflictException ex, WebRequest request) {
+        log.warn("Subscription conflict [{}]: {}", path(request), ex.getMessage());
         return buildProblem(HttpStatus.CONFLICT, "subscription-conflict",
                 "Subscription Conflict", ex.getMessage(), request);
     }
@@ -31,6 +32,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(EligibilityNotMetException.class)
     public ResponseEntity<ProblemDetail> handleEligibilityNotMet(
             EligibilityNotMetException ex, WebRequest request) {
+        log.warn("Eligibility not met [{}]: {}", path(request), ex.getMessage());
         return buildProblem(HttpStatus.UNPROCESSABLE_ENTITY, "eligibility-not-met",
                 "Eligibility Not Met", ex.getMessage(), request);
     }
@@ -38,6 +40,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(IllegalStateTransitionException.class)
     public ResponseEntity<ProblemDetail> handleIllegalTransition(
             IllegalStateTransitionException ex, WebRequest request) {
+        log.warn("Illegal state transition [{}]: {}", path(request), ex.getMessage());
         return buildProblem(HttpStatus.CONFLICT, "invalid-state-transition",
                 "Invalid State Transition", ex.getMessage(), request);
     }
@@ -45,6 +48,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler({SubscriptionNotFoundException.class, ResourceNotFoundException.class})
     public ResponseEntity<ProblemDetail> handleNotFound(
             DomainException ex, WebRequest request) {
+        log.warn("Resource not found [{}]: {}", path(request), ex.getMessage());
         return buildProblem(HttpStatus.NOT_FOUND, "resource-not-found",
                 "Resource Not Found", ex.getMessage(), request);
     }
@@ -52,6 +56,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(PaymentFailedException.class)
     public ResponseEntity<ProblemDetail> handlePaymentFailed(
             PaymentFailedException ex, WebRequest request) {
+        log.warn("Payment failed [{}]: {}", path(request), ex.getMessage());
         return buildProblem(HttpStatus.PAYMENT_REQUIRED, "payment-failed",
                 "Payment Failed", ex.getMessage(), request);
     }
@@ -59,6 +64,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(IdempotencyViolationException.class)
     public ResponseEntity<ProblemDetail> handleIdempotencyViolation(
             IdempotencyViolationException ex, WebRequest request) {
+        log.warn("Idempotency violation [{}]: {}", path(request), ex.getMessage());
         return buildProblem(HttpStatus.CONFLICT, "idempotency-violation",
                 "Idempotency Violation", ex.getMessage(), request);
     }
@@ -67,7 +73,7 @@ public class GlobalExceptionHandler {
             OptimisticLockException.class})
     public ResponseEntity<ProblemDetail> handleOptimisticLock(
             Exception ex, WebRequest request) {
-        log.warn("Optimistic lock conflict: {}", ex.getMessage());
+        log.warn("Optimistic lock conflict [{}]: {}", path(request), ex.getMessage());
         return buildProblem(HttpStatus.CONFLICT, "concurrent-modification",
                 "Concurrent Modification",
                 "The resource was modified by another request. Please retry.", request);
@@ -79,13 +85,14 @@ public class GlobalExceptionHandler {
         String detail = ex.getBindingResult().getFieldErrors().stream()
                 .map(fe -> fe.getField() + ": " + fe.getDefaultMessage())
                 .collect(Collectors.joining(", "));
+        log.warn("Validation failed [{}]: {}", path(request), detail);
         return buildProblem(HttpStatus.BAD_REQUEST, "validation-failed",
                 "Validation Failed", detail, request);
     }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ProblemDetail> handleGeneral(Exception ex, WebRequest request) {
-        log.error("Unexpected error: {}", ex.getMessage(), ex);
+        log.error("Unexpected error [{}]: {}", path(request), ex.getMessage(), ex);
         return buildProblem(HttpStatus.INTERNAL_SERVER_ERROR, "internal-error",
                 "Internal Server Error",
                 "An unexpected error occurred. Please try again later.", request);
@@ -98,9 +105,13 @@ public class GlobalExceptionHandler {
         problem.setType(URI.create(ERROR_BASE_URI + errorType));
         problem.setTitle(title);
         problem.setDetail(detail);
-        problem.setInstance(URI.create(request.getDescription(false).replace("uri=", "")));
+        problem.setInstance(URI.create(path(request)));
         problem.setProperty("timestamp", Instant.now().toString());
         return ResponseEntity.status(status).contentType(MediaType.APPLICATION_PROBLEM_JSON)
                 .body(problem);
+    }
+
+    private String path(WebRequest request) {
+        return request.getDescription(false).replace("uri=", "");
     }
 }

@@ -67,7 +67,9 @@ public class AdminCatalogService {
                 .orElseThrow(() -> new ResourceNotFoundException("Plan not found: " + planId));
         plan.setActive(active);
         plan.setUpdatedAt(Instant.now());
-        return planRepo.save(plan);
+        MembershipPlanEntity saved = planRepo.save(plan);
+        log.info("Admin: plan {} active={}", planId, active);
+        return saved;
     }
 
     @Transactional(readOnly = true)
@@ -107,7 +109,9 @@ public class AdminCatalogService {
                 .orElseThrow(() -> new ResourceNotFoundException("Tier not found: " + tierId));
         tier.setActive(active);
         tier.setUpdatedAt(Instant.now());
-        return tierRepo.save(tier);
+        MembershipTierEntity saved = tierRepo.save(tier);
+        log.info("Admin: tier {} active={}", tierId, active);
+        return saved;
     }
 
     // -------------------------------------------------------------------------
@@ -145,7 +149,9 @@ public class AdminCatalogService {
         TierBenefitEntity benefit = benefitRepo.findById(benefitId)
                 .orElseThrow(() -> new ResourceNotFoundException("Benefit not found: " + benefitId));
         benefit.setActive(active);
-        return benefitRepo.save(benefit);
+        TierBenefitEntity saved = benefitRepo.save(benefit);
+        log.info("Admin: benefit {} active={}", benefitId, active);
+        return saved;
     }
 
     @Transactional(readOnly = true)

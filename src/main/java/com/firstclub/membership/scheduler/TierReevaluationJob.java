@@ -42,8 +42,10 @@ public class TierReevaluationJob {
             lockAtMostFor = "PT2H")
     @Transactional(readOnly = true)
     public void reevaluateTiers() {
+        long start = System.currentTimeMillis();
         List<UserSubscription> activeSubscriptions = subscriptionRepo.findAllActive();
-        log.info("Tier reevaluation started: {} active subscriptions", activeSubscriptions.size());
+        log.info("TierReevaluationJob started: {} active subscriptions to check",
+                activeSubscriptions.size());
 
         int checked = 0;
         for (UserSubscription subscription : activeSubscriptions) {
@@ -63,6 +65,7 @@ public class TierReevaluationJob {
             }
         }
 
-        log.info("Tier reevaluation completed: {} subscriptions checked", checked);
+        log.info("TierReevaluationJob completed: {} subscriptions checked in {} ms",
+                checked, System.currentTimeMillis() - start);
     }
 }

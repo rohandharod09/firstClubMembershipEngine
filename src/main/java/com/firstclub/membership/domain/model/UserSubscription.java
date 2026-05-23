@@ -1,5 +1,6 @@
 package com.firstclub.membership.domain.model;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.firstclub.membership.common.exception.IllegalStateTransitionException;
 import com.firstclub.membership.domain.statemachine.SubscriptionStateMachine;
 
@@ -27,6 +28,9 @@ public class UserSubscription {
     private Instant createdAt;
     private Instant updatedAt;
 
+    // @JsonCreator on the no-arg constructor lets Jackson create an empty instance
+    // and then populate it via the existing public setters during Redis deserialization.
+    @JsonCreator
     private UserSubscription() {}
 
     /** Reconstructs an aggregate loaded from persistence (mapper use only). */

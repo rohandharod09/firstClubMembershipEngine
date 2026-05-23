@@ -1,5 +1,9 @@
 package com.firstclub.membership.domain.model;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -14,17 +18,24 @@ public class MembershipTier {
     private final List<TierBenefit> benefits;
     private final List<TierEligibilityRule> eligibilityRules;
 
-    public MembershipTier(UUID id, UUID planId, String name, int rank, long priceCents,
-                          boolean active, List<TierBenefit> benefits,
-                          List<TierEligibilityRule> eligibilityRules) {
+    @JsonCreator
+    public MembershipTier(
+            @JsonProperty("id") UUID id,
+            @JsonProperty("planId") UUID planId,
+            @JsonProperty("name") String name,
+            @JsonProperty("rank") int rank,
+            @JsonProperty("priceCents") long priceCents,
+            @JsonProperty("active") boolean active,
+            @JsonProperty("benefits") List<TierBenefit> benefits,
+            @JsonProperty("eligibilityRules") List<TierEligibilityRule> eligibilityRules) {
         this.id = id;
         this.planId = planId;
         this.name = name;
         this.rank = rank;
         this.priceCents = priceCents;
         this.active = active;
-        this.benefits = benefits != null ? List.copyOf(benefits) : List.of();
-        this.eligibilityRules = eligibilityRules != null ? List.copyOf(eligibilityRules) : List.of();
+        this.benefits = benefits != null ? new ArrayList<>(benefits) : new ArrayList<>();
+        this.eligibilityRules = eligibilityRules != null ? new ArrayList<>(eligibilityRules) : new ArrayList<>();
     }
 
     public UUID getId() { return id; }

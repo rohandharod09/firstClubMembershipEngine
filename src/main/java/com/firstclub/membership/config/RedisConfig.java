@@ -1,6 +1,8 @@
 package com.firstclub.membership.config;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.jsontype.impl.LaissezFaireSubTypeValidator;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -30,11 +32,21 @@ public class RedisConfig {
     public ObjectMapper redisObjectMapper() {
         ObjectMapper mapper = new ObjectMapper();
         mapper.registerModule(new JavaTimeModule());
+
+        // Allow Jackson to access private fields and private constructors.
+        // Required for UserSubscription whose no-arg constructor is private,
+        // and for classes with only all-args constructors and no setters.
+        mapper.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY);
+
+        // Embed @class type info into JSON so Jackson knows which concrete class to
+        // instantiate when deserializing from Redis — without this every cache read fails.
+        // NON_FINAL embeds type metadata for all non-final types (incl. our domain objects).
         mapper.activateDefaultTyping(
                 LaissezFaireSubTypeValidator.instance,
                 ObjectMapper.DefaultTyping.NON_FINAL,
                 JsonTypeInfo.As.PROPERTY
         );
+
         return mapper;
     }
 
