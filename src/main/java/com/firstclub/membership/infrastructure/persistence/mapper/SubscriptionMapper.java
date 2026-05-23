@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 public class SubscriptionMapper {
 
     public UserSubscription toDomain(UserSubscriptionEntity entity) {
-        UserSubscription sub = new UserSubscription();
+        UserSubscription sub = UserSubscription.reconstitute();
         sub.setId(entity.getId());
         sub.setUserId(entity.getUserId());
         sub.setPlanId(entity.getPlanId());

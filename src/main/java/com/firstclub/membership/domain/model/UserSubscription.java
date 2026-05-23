@@ -29,6 +29,11 @@ public class UserSubscription {
 
     private UserSubscription() {}
 
+    /** Reconstructs an aggregate loaded from persistence (mapper use only). */
+    public static UserSubscription reconstitute() {
+        return new UserSubscription();
+    }
+
     public static UserSubscription create(UUID userId, UUID planId, UUID tierId,
                                           Instant startDate, Instant endDate, boolean autoRenew) {
         UserSubscription sub = new UserSubscription();
