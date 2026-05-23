@@ -1,0 +1,36 @@
+spring:
+  datasource:
+    url: jdbc:tc:postgresql:16:///firstclub_test
+    driver-class-name: org.testcontainers.jdbc.ContainerDatabaseDriver
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+
+  sql:
+    init:
+      mode: always
+      schema-locations: classpath:schema.sql
+      data-locations: classpath:data.sql
+
+  data:
+    redis:
+      host: 127.0.0.1
+      port: 6379
+
+  cache:
+    type: redis
+
+membership:
+  grace-period-days: 3
+  idempotency-ttl-hours: 24
+  scheduler:
+    expiry-fixed-delay-ms: 300000
+    renewal-fixed-delay-ms: 900000
+    tier-reevaluation-cron: "0 0 2 * * *"
+    downgrade-fixed-delay-ms: 3600000
+
+logging:
+  level:
+    com.firstclub.membership: DEBUG
