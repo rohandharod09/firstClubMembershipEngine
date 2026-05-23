@@ -11,7 +11,7 @@ public class PaymentTransaction {
     private final long amountCents;
     private final String currency;
     private PaymentStatus status;
-    private final String externalTxnId;
+    private String externalTxnId;          // set after gateway responds
     private final String idempotencyKey;
     private final Instant createdAt;
 
@@ -39,6 +39,7 @@ public class PaymentTransaction {
 
     public void markSuccess(String externalTxnId) {
         this.status = PaymentStatus.SUCCESS;
+        this.externalTxnId = externalTxnId;
     }
 
     public void markFailed() {
