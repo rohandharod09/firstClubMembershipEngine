@@ -78,6 +78,7 @@ membership:
     renewal-fixed-delay-ms: 900000
     tier-reevaluation-cron: "0 0 2 * * *"
     downgrade-fixed-delay-ms: 3600000
+    idempotency-cleanup-cron: "0 0 * * * *"   # every hour
 
 logging:
   level:
